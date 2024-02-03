@@ -610,7 +610,16 @@ public class CameraService: NSObject, Identifiable {
         }
         keyValueObservations.append(systemPressureStateObservation)
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
+        // Check if videoDeviceInput and its device property are not nil
+        if let device = videoDeviceInput?.device {
+            // If they are not nil, add an observer to the NotificationCenter
+            NotificationCenter.default.addObserver(self,
+                selector: #selector(subjectAreaDidChange),
+                name: .AVCaptureDeviceSubjectAreaDidChange,
+                object: device)
+        }
+
+//      NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(subjectAreaDidChange),
