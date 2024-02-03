@@ -203,6 +203,40 @@ public class CameraService: NSObject, Identifiable {
         session.sessionPreset = .photo
         
         // Add video input.
+        
+        do {
+            var defaultVideoDevice: AVCaptureDevice?
+
+            if let externalCameraDevice = AVCaptureDevice.default(.external, for: .video, position: .unspecified) {
+                // If an external camera is available, default to the external camera.
+                defaultVideoDevice = externalCameraDevice
+                isExternalDeviceAvailable = true
+            } else {
+                // If an external camera is not available, set isExternalDeviceAvailable to false.
+                isExternalDeviceAvailable = false
+            }
+
+            // If a default video device is available (i.e., an external camera is connected), configure the session.
+            if let videoDevice = defaultVideoDevice {
+                let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
+
+                if session.canAddInput(videoDeviceInput) {
+                    session.addInput(videoDeviceInput)
+                    self.videoDeviceInput = videoDeviceInput
+                } else {
+                    print("Couldn't add video device input to the session.")
+                    setupResult = .configurationFailed
+                    session.commitConfiguration()
+                    return
+                }
+            }
+        } catch {
+            print("Couldn't create video device input: \(error)")
+            setupResult = .configurationFailed
+            session.commitConfiguration()
+            return
+        }
+/*
         do {
             var defaultVideoDevice: AVCaptureDevice?
             
@@ -239,6 +273,7 @@ public class CameraService: NSObject, Identifiable {
             session.commitConfiguration()
             return
         }
+ */
         
         // Add the photo output.
         if session.canAddOutput(photoOutput) {
