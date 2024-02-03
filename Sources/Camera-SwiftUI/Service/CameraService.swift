@@ -62,7 +62,8 @@ public class CameraService: NSObject, Identifiable {
     typealias PhotoCaptureSessionID = String
     
     //    MARK: Observed Properties UI must react to
-    
+    public var isExternalDeviceAvailable: Bool = false
+
     @Published public var flashMode: AVCaptureDevice.FlashMode = .off
     @Published public var shouldShowAlertView = false
     @Published public var shouldShowSpinner = false
@@ -184,6 +185,14 @@ public class CameraService: NSObject, Identifiable {
         if setupResult != .success {
             return
         }
+        
+        // Look for an external device
+        if let device = self.videoDeviceDiscoverySession.devices.first(where: { $0.deviceType == .external }) {
+            isExternalDeviceAvailable = true
+        } else {
+            isExternalDeviceAvailable = false
+        }
+
         
         session.beginConfiguration()
         
