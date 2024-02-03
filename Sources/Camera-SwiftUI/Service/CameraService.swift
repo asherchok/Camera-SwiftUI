@@ -57,6 +57,7 @@ extension Photo {
     }
 }
 
+@available(iOS 17.0, *)
 public class CameraService: NSObject, Identifiable {
     typealias PhotoCaptureSessionID = String
     
@@ -88,7 +89,7 @@ public class CameraService: NSObject, Identifiable {
     @objc dynamic var videoDeviceInput: AVCaptureDeviceInput!
     
     // MARK: Device Configuration Properties
-    let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInTrueDepthCamera], mediaType: .video, position: .unspecified)
+    let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInTrueDepthCamera, .external], mediaType: .video, position: .unspecified)
     
     // MARK: Capturing Photos
     
@@ -163,11 +164,11 @@ public class CameraService: NSObject, Identifiable {
             setupResult = .notAuthorized
             
             DispatchQueue.main.async {
-                self.alertError = AlertError(title: "Camera Access", message: "Campus no tiene permiso para usar la cámara, por favor cambia la configruación de privacidad", primaryButtonTitle: "Configuración", secondaryButtonTitle: nil, primaryAction: {
-                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
-                                                  options: [:], completionHandler: nil)
-                    
-                }, secondaryAction: nil)
+                self.alertError = AlertError(title: "Camera Access", message: "Campus does not have permission to use the camera, please change the privacy settings", primaryButtonTitle: "Settings", secondaryButtonTitle: nil, primaryAction: {
+                                        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
+                                                                  options: [:], completionHandler: nil)
+                })
+
                 self.shouldShowAlertView = true
                 self.isCameraUnavailable = true
                 self.isCameraButtonDisabled = true
@@ -281,11 +282,10 @@ public class CameraService: NSObject, Identifiable {
     
     /// - Tag: ChangeCamera
     public func changeCamera() {
-        //        MARK: Here disable all camera operation related buttons due to configuration is due upon and must not be interrupted
+        // Disable all camera operation related buttons due to configuration is due upon and must not be interrupted
         DispatchQueue.main.async {
             self.isCameraButtonDisabled = true
         }
-        //
         
         sessionQueue.async {
             let currentVideoDevice = self.videoDeviceInput.device
@@ -300,6 +300,10 @@ public class CameraService: NSObject, Identifiable {
                 preferredDeviceType = .builtInWideAngleCamera
                 
             case .back:
+                preferredPosition = .unspecified
+                preferredDeviceType = .external
+                
+            case .unspecified:
                 preferredPosition = .front
                 preferredDeviceType = .builtInWideAngleCamera
                 
@@ -308,6 +312,7 @@ public class CameraService: NSObject, Identifiable {
                 preferredPosition = .back
                 preferredDeviceType = .builtInWideAngleCamera
             }
+            
             let devices = self.videoDeviceDiscoverySession.devices
             var newVideoDevice: AVCaptureDevice? = nil
             
@@ -353,11 +358,12 @@ public class CameraService: NSObject, Identifiable {
             }
             
             DispatchQueue.main.async {
-                //                MARK: Here enable all camera operation related buttons due to succesfull setup
+                // Enable all camera operation related buttons due to successful setup
                 self.isCameraButtonDisabled = false
             }
         }
     }
+
     
     public func focus(with focusMode: AVCaptureDevice.FocusMode, exposureMode: AVCaptureDevice.ExposureMode, at devicePoint: CGPoint, monitorSubjectAreaChange: Bool) {
         sessionQueue.async {

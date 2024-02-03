@@ -9,6 +9,7 @@
 import Foundation
 
 //  MARK: CameraService Enums
+@available(iOS 17.0, *)
 extension CameraService {
     enum LivePhotoMode {
         case on
