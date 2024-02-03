@@ -215,11 +215,6 @@ public class CameraService: NSObject, Identifiable {
                 // If an external camera is not available, set isExternalDeviceAvailable to false.
                 isExternalDeviceAvailable = false
             }
-            
-            guard let videoDeviceInput = self.videoDeviceInput else {
-                print("No video device input available.")
-                return
-            }
 
             // If a default video device is available (i.e., an external camera is connected), configure the session.
             if let videoDevice = defaultVideoDevice {
@@ -372,11 +367,6 @@ public class CameraService: NSObject, Identifiable {
                 newVideoDevice = device
             }
             
-            guard let currentVideoDevice = self.videoDeviceInput?.device else {
-                print("No video device input available.")
-                return
-            }
-            
             if let videoDevice = newVideoDevice {
                 do {
                     let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
@@ -525,17 +515,15 @@ public class CameraService: NSObject, Identifiable {
     
     public func set(zoom: CGFloat){
         let factor = zoom < 1 ? 1 : zoom
-        if let device = self.videoDeviceInput?.device {
-            do {
-                try device.lockForConfiguration()
-                device.videoZoomFactor = factor
-                device.unlockForConfiguration()
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-        } else {
-            print("No video device input available.")
+        let device = self.videoDeviceInput.device //Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
+        
+        do {
+            try device.lockForConfiguration()
+            device.videoZoomFactor = factor
+            device.unlockForConfiguration()
+        }
+        catch {
+            print(error.localizedDescription)
         }
     }
     
