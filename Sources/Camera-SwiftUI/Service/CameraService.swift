@@ -165,7 +165,7 @@ public class CameraService: NSObject, Identifiable {
             setupResult = .notAuthorized
             
             DispatchQueue.main.async {
-                self.alertError = AlertError(title: "Camera Access", message: "Campus does not have permission to use the camera, please change the privacy settings", primaryButtonTitle: "Settings", secondaryButtonTitle: nil, primaryAction: {
+                self.alertError = AlertError(title: "Camera Access", message: "The app does not have permission to use the camera. Please change the privacy settings.", primaryButtonTitle: "Settings", secondaryButtonTitle: nil, primaryAction: {
                                         UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!,
                                                                   options: [:], completionHandler: nil)
                 })
@@ -186,24 +186,10 @@ public class CameraService: NSObject, Identifiable {
             return
         }
         
-        // Look for an external device
-        if let device = self.videoDeviceDiscoverySession.devices.first(where: { $0.deviceType == .external }) {
-            isExternalDeviceAvailable = true
-        } else {
-            isExternalDeviceAvailable = false
-        }
-
-        
         session.beginConfiguration()
-        
-        /*
-         Do not create an AVCaptureMovieFileOutput when setting up the session because
-         Live Photo is not supported when AVCaptureMovieFileOutput is added to the session.
-         */
         session.sessionPreset = .photo
         
         // Add video input.
-        
         do {
             var defaultVideoDevice: AVCaptureDevice?
 
