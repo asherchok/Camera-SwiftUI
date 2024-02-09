@@ -197,9 +197,11 @@ public class CameraService: NSObject, Identifiable {
                 // If an external camera is available, default to the external camera.
                 defaultVideoDevice = externalCameraDevice
                 isExternalDeviceAvailable = true
+                print("isExternalDeviceAvailable true")
             } else {
                 // If an external camera is not available, set isExternalDeviceAvailable to false.
                 isExternalDeviceAvailable = false
+                print("isExternalDeviceAvailable false")
             }
 
             // If a default video device is available (i.e., an external camera is connected), configure the session.
