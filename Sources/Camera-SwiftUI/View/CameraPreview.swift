@@ -79,8 +79,10 @@ public struct CameraPreview: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: VideoPreviewView, context: Context) {
-        let size = uiView.intrinsicContentSize
-        print("CameraPreview size: \(size)")
+        DispatchQueue.main.async {
+            let size = uiView.frame.size
+            print("CameraPreview size: \(size)")
+        }
     }
 
 }
