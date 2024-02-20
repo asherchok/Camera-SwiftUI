@@ -20,46 +20,15 @@ public struct CameraPreview: UIViewRepresentable {
             return layer as! AVCaptureVideoPreviewLayer
         }
         
-        let focusView: UIView = {
-            let focusView = UIView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-            focusView.layer.borderColor = UIColor.white.cgColor
-            focusView.layer.borderWidth = 1.5
-            focusView.layer.cornerRadius = 25
-            focusView.layer.opacity = 0
-            focusView.backgroundColor = .clear
-            return focusView
-        }()
-        
-        @objc func focusAndExposeTap(gestureRecognizer: UITapGestureRecognizer) {
-            let layerPoint = gestureRecognizer.location(in: gestureRecognizer.view)
-            let devicePoint = videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: layerPoint)
-            
-            let focusCircleDiam: CGFloat = 50
-            let shiftedLayerPoint = CGPoint(x: layerPoint.x - (focusCircleDiam / 2),
-                y: layerPoint.y - (focusCircleDiam / 2))
-                        
-            focusView.layer.frame = CGRect(origin: shiftedLayerPoint, size: CGSize(width: focusCircleDiam, height: focusCircleDiam))
-      
-            NotificationCenter.default.post(.init(name: .init("UserDidRequestNewFocusPoint"), object: nil, userInfo: ["devicePoint": devicePoint] as [AnyHashable: Any]))
-            
-            UIView.animate(withDuration: 0.3, animations: {
-                self.focusView.layer.opacity = 1
-            }) { (completed) in
-                if completed {
-                    UIView.animate(withDuration: 0.3) {
-                        self.focusView.layer.opacity = 0
-                    }
-                }
-            }
-        }
         
         public override func layoutSubviews() {
             super.layoutSubviews()
-            
+            /* No need to focus on external camera
             self.layer.addSublayer(focusView.layer)
             
             let gRecognizer = UITapGestureRecognizer(target: self, action: #selector(VideoPreviewView.focusAndExposeTap(gestureRecognizer:)))
             self.addGestureRecognizer(gRecognizer)
+             */
         }
     }
     
