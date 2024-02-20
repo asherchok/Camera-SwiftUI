@@ -567,7 +567,7 @@ public class CameraService: NSObject, Identifiable {
 
 //      NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(uiRequestedNewFocusArea), name: .init(rawValue: "UserDidRequestNewFocusPoint"), object: nil)
+//      NotificationCenter.default.addObserver(self, selector: #selector(uiRequestedNewFocusArea), name: .init(rawValue: "UserDidRequestNewFocusPoint"), object: nil)  /* No need to focus on external camera */
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(sessionRuntimeError),
@@ -599,12 +599,12 @@ public class CameraService: NSObject, Identifiable {
         }
         keyValueObservations.removeAll()
     }
-    
+    /* No need to focus on external camera
     @objc private func uiRequestedNewFocusArea(notification: NSNotification) {
         guard let userInfo = notification.userInfo as? [String: Any], let devicePoint = userInfo["devicePoint"] as? CGPoint else { return }
         self.focus(at: devicePoint)
     }
-    
+    */
     @objc
     private func subjectAreaDidChange(notification: NSNotification) {
         let devicePoint = CGPoint(x: 0.5, y: 0.5)
