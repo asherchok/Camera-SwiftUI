@@ -51,6 +51,8 @@ public struct CameraPreview: UIViewRepresentable {
         DispatchQueue.main.async {
             let size = uiView.frame.size
             print("CameraPreview size: \(size)")
+            print("CameraPreview width: \(uiView.videoPreviewLayer.bounds.width)")
+            print("CameraPreview height: \(uiView.videoPreviewLayer.bounds.height)")
         }
     }
 
