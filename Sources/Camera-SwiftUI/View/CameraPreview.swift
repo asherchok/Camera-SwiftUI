@@ -17,6 +17,10 @@ public struct CameraPreview: UIViewRepresentable {
         }
         
         var videoPreviewLayer: AVCaptureVideoPreviewLayer {
+            let layerBounds = (layer as! AVCaptureVideoPreviewLayer).bounds
+            let width = layerBounds.width
+            let height = layerBounds.height
+            print("Width: \(width), Height: \(height)")
             return layer as! AVCaptureVideoPreviewLayer
         }
         
@@ -43,12 +47,6 @@ public struct CameraPreview: UIViewRepresentable {
     }
     
     public func updateUIView(_ uiView: VideoPreviewView, context: Context) {
-        DispatchQueue.main.async {
-            let size = uiView.frame.size
-            print("CameraPreview size: \(size)")
-            print("CameraPreview width: \(uiView.videoPreviewLayer.bounds.width)")
-            print("CameraPreview height: \(uiView.videoPreviewLayer.bounds.height)")
-        }
     }
 
 }
