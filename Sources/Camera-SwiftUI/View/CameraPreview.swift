@@ -17,10 +17,6 @@ public struct CameraPreview: UIViewRepresentable {
         }
         
         var videoPreviewLayer: AVCaptureVideoPreviewLayer {
-            let layerBounds = (layer as! AVCaptureVideoPreviewLayer).bounds
-            let width = layerBounds.width
-            let height = layerBounds.height
-            print("Width: \(width), Height: \(height)")
             return layer as! AVCaptureVideoPreviewLayer
         }
         
