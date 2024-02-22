@@ -23,12 +23,7 @@ public struct CameraPreview: UIViewRepresentable {
         
         public override func layoutSubviews() {
             super.layoutSubviews()
-            /* No need to focus on external camera
-            self.layer.addSublayer(focusView.layer)
-            
-            let gRecognizer = UITapGestureRecognizer(target: self, action: #selector(VideoPreviewView.focusAndExposeTap(gestureRecognizer:)))
-            self.addGestureRecognizer(gRecognizer)
-             */
+            videoPreviewLayer.bounds = bounds
         }
     }
     
