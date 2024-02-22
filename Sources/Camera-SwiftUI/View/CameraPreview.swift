@@ -35,7 +35,7 @@ public struct CameraPreview: UIViewRepresentable {
     
     public func makeUIView(context: Context) -> VideoPreviewView {
         let viewFinder = VideoPreviewView()
-        viewFinder.backgroundColor = .black
+        viewFinder.backgroundColor = .blue
         viewFinder.videoPreviewLayer.cornerRadius = 0
         viewFinder.videoPreviewLayer.session = session
         viewFinder.videoPreviewLayer.connection?.videoOrientation = .portrait
