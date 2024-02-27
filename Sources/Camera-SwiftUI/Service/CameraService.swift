@@ -274,87 +274,6 @@ public class CameraService: NSObject, Identifiable {
     
     //  MARK: Device Configuration
     
-    /// - Tag: ChangeCamera
-    public func changeCamera() {
-        // Disable all camera operation related buttons due to configuration is due upon and must not be interrupted
-        DispatchQueue.main.async {
-            self.isCameraButtonDisabled = true
-        }
-        
-        sessionQueue.async {
-            let currentVideoDevice = self.videoDeviceInput.device
-            let currentPosition = currentVideoDevice.position
-            
-            let preferredPosition: AVCaptureDevice.Position
-            let preferredDeviceType: AVCaptureDevice.DeviceType
-            
-            switch currentPosition {
-            case .unspecified, .front:
-                preferredPosition = .back
-                preferredDeviceType = .builtInWideAngleCamera
-                
-            case .back:
-                preferredPosition = .unspecified
-                preferredDeviceType = .external
-                
-            @unknown default:
-                print("Unknown capture position. Defaulting to back, dual-camera.")
-                preferredPosition = .back
-                preferredDeviceType = .builtInWideAngleCamera
-            }
-            
-            let devices = self.videoDeviceDiscoverySession.devices
-            var newVideoDevice: AVCaptureDevice? = nil
-            
-            // First, seek a device with both the preferred position and device type. Otherwise, seek a device with only the preferred position.
-            if let device = devices.first(where: { $0.position == preferredPosition && $0.deviceType == preferredDeviceType }) {
-                newVideoDevice = device
-            } else if let device = devices.first(where: { $0.position == preferredPosition }) {
-                newVideoDevice = device
-            }
-            
-            if let videoDevice = newVideoDevice {
-                do {
-                    let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
-                    
-                    self.session.beginConfiguration()
-                    
-                    // Remove the existing device input first, because AVCaptureSession doesn't support
-                    // simultaneous use of the rear and front cameras.
-                    self.session.removeInput(self.videoDeviceInput)
-                    
-                    if self.session.canAddInput(videoDeviceInput) {
-                        NotificationCenter.default.removeObserver(self, name: .AVCaptureDeviceSubjectAreaDidChange, object: currentVideoDevice)
-                        NotificationCenter.default.addObserver(self, selector: #selector(self.subjectAreaDidChange), name: .AVCaptureDeviceSubjectAreaDidChange, object: videoDeviceInput.device)
-                        
-                        self.session.addInput(videoDeviceInput)
-                        self.videoDeviceInput = videoDeviceInput
-                    } else {
-                        self.session.addInput(self.videoDeviceInput)
-                    }
-                    
-                    if let connection = self.photoOutput.connection(with: .video) {
-                        if connection.isVideoStabilizationSupported {
-                            connection.preferredVideoStabilizationMode = .auto
-                        }
-                    }
-                    
-                    self.photoOutput.maxPhotoQualityPrioritization = .quality
-                    
-                    self.session.commitConfiguration()
-                } catch {
-                    print("Error occurred while creating video device input: \(error)")
-                }
-            }
-            
-            DispatchQueue.main.async {
-                // Enable all camera operation related buttons due to successful setup
-                self.isCameraButtonDisabled = false
-            }
-        }
-    }
-
-    
     public func focus(with focusMode: AVCaptureDevice.FocusMode, exposureMode: AVCaptureDevice.ExposureMode, at devicePoint: CGPoint, monitorSubjectAreaChange: Bool) {
         sessionQueue.async {
             guard let device = self.videoDeviceInput?.device else { return }
@@ -380,24 +299,6 @@ public class CameraService: NSObject, Identifiable {
             } catch {
                 print("Could not lock device for configuration: \(error)")
             }
-        }
-    }
-    
-    
-    public func focus(at focusPoint: CGPoint){
-        let device = self.videoDeviceInput.device
-        do {
-            try device.lockForConfiguration()
-            if device.isFocusPointOfInterestSupported {
-                device.focusPointOfInterest = focusPoint
-                device.exposurePointOfInterest = focusPoint
-                device.exposureMode = .continuousAutoExposure
-                device.focusMode = .continuousAutoFocus
-                device.unlockForConfiguration()
-            }
-        }
-        catch {
-            print(error.localizedDescription)
         }
     }
     
@@ -459,19 +360,6 @@ public class CameraService: NSObject, Identifiable {
         }
     }
     
-    public func set(zoom: CGFloat){
-        let factor = zoom < 1 ? 1 : zoom
-        let device = self.videoDeviceInput.device //Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
-        
-        do {
-            try device.lockForConfiguration()
-            device.videoZoomFactor = factor
-            device.unlockForConfiguration()
-        }
-        catch {
-            print(error.localizedDescription)
-        }
-    }
     
     //    MARK: Capture Photo
     
